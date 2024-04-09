@@ -5,22 +5,50 @@ import {evaluate} from 'mathjs';
 
 function App() {
   const [result,setResult] = useState("");
+  const [exchangeRate, setExchangeRate] = useState(null);
 
-  const handleClick = (value) => {
-    if(value==="="){
-      try{
-        setResult(evaluate (result))
-      }catch (error) {
-        setResult("Error");
+  const fetchExchangeRate = async () => {
+    try{
+      const response = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=USD&target=INR');
+      const data = await response.json();
+      console.log(data)
+      const rate = data.exchange_rates.INR;
+      setExchangeRate(rate)
+      const response1 = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=INR&target=USD');
+      const data1 = await response1.json();
+      console.log(data1)
+      const rate1 = data1.exchange_rates.USD;
+      setExchangeRate(rate1)
+    }catch(error){
+      console.error('Error:', error)
+    }
+  }
+
+  const handleClick = async(value) => {
+    // if(value==="="){
+    //     setResult(evaluate (result))
+    //   }
+    if (value === "="){
+      if(result === "" || parseFloat(result)===0){
+        setResult("")
+      } else {
+        try {
+          setResult (evaluate (result))
+        }catch (error){
+          setResult("Error", error)
+        }
       }
+      
     }else if (value=== "c"){
-      setResult("");
-    } else if (value=== "USD-INR"){
-      setResult(prevResult => prevResult + "*84")
+        setResult("");
+      }else if (value=== "USD-INR"){
+        if(!exchangeRate) await fetchExchangeRate();
+        setResult(prevResult => prevResult + `*${exchangeRate}`)
     }else if (value === "INR-USD"){
-      setResult(prevResult => prevResult + "/84")
+      if(!exchangeRate) await fetchExchangeRate();
+      setResult(prevResult => prevResult + `/${exchangeRate}`)
     }else{
-      setResult(result+value)
+      setResult(result + value)
     }
   }
 
@@ -59,18 +87,3 @@ function App() {
 export default App;
 
 
-// eval
-
-// const handleClick = (value) => {
-//   if(value==="="){
-//     try{
-//       setResult(eval(result))
-//     }catch (error) {
-//       setResult("Error");
-//     }
-//   }else if (value=== "c"){
-//     setResult("");
-//   }else{
-//     setResult(result+value)
-//   }
-// }
