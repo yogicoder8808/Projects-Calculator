@@ -15,11 +15,14 @@ function App() {
       }
     }else if (value=== "c"){
       setResult("");
+    } else if (value=== "USD-INR"){
+      setResult(prevResult => prevResult + "*84")
+    }else if (value === "INR-USD"){
+      setResult(prevResult => prevResult + "/84")
     }else{
       setResult(result+value)
     }
   }
-
 
   return (
     <div className="App">
@@ -42,6 +45,8 @@ function App() {
           <button onClick={() => handleClick("0")}>0</button>
           <button onClick={() => handleClick("=")}>=</button>
           <button onClick={() => handleClick("/")}>/</button>
+          <button onClick={() => handleClick("USD-INR")}>$ to INR</button>
+          <button onClick={() => handleClick("INR-USD")}>INR to $</button>
 
         </div>
 
