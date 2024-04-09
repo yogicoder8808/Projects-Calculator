@@ -9,25 +9,25 @@ function App() {
 
   const fetchExchangeRate = async () => {
     try{
-      const response = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=USD&target=INR');
-      const data = await response.json();
-      console.log(data)
-      const rate = data.exchange_rates.INR;
-      setExchangeRate(rate)
-      const response1 = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=INR&target=USD');
-      const data1 = await response1.json();
-      console.log(data1)
-      const rate1 = data1.exchange_rates.USD;
-      setExchangeRate(rate1)
+      const responseUSD = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=USD&target=INR');
+      const dataUSD = await responseUSD.json();
+      console.log(dataUSD)
+      const rateUSD = dataUSD.exchange_rates.INR;
+      setExchangeRate(rateUSD)
+      
+      const responseINR = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=INR&target=USD');
+      const dataINR = await responseINR.json();
+      console.log(dataINR)
+      const rateINR = dataINR.exchange_rates.USD;
+      setExchangeRate(rateINR)
+
     }catch(error){
-      console.error('Error:', error)
+      console.error('Error:', error.message)
     }
   }
 
   const handleClick = async(value) => {
-    // if(value==="="){
-    //     setResult(evaluate (result))
-    //   }
+
     if (value === "="){
       if(result === "" || parseFloat(result)===0){
         setResult("")
@@ -48,7 +48,7 @@ function App() {
       if(!exchangeRate) await fetchExchangeRate();
       setResult(prevResult => prevResult + `/${exchangeRate}`)
     }else{
-      setResult(result + value)
+      setResult(prevResult => prevResult + value)
     }
   }
 
