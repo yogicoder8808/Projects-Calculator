@@ -1,89 +1,79 @@
 import { useState } from 'react';
 import './App.css';
-import {evaluate} from 'mathjs';
 
 
-function App() {
-  const [result,setResult] = useState("");
-  const [exchangeRate, setExchangeRate] = useState(null);
+ const Calendar = () => {
+  const [date, setDate] = useState(new Date())
 
-  const fetchExchangeRate = async () => {
-    try{
-      const responseUSD = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=USD&target=INR');
-      const dataUSD = await responseUSD.json();
-      console.log(dataUSD)
-      const rateUSD = dataUSD.exchange_rates.INR;
-      setExchangeRate(rateUSD)
-      
-      const responseINR = await fetch ('https://exchange-rates.abstractapi.com/v1/live/?api_key=3cf3ef34653b4b77ba73a5067bef9f76&base=INR&target=USD');
-      const dataINR = await responseINR.json();
-      console.log(dataINR)
-      const rateINR = dataINR.exchange_rates.USD;
-      setExchangeRate(rateINR)
+  const renderCalendar = () => {
 
-    }catch(error){
-      console.error('Error:', error.message)
-    }
-  }
+    const daysOfWeek =  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    const month = date.getMonth()
+    const year = date.getFullYear()
 
-  const handleClick = async(value) => {
+    const firstDayOfMonth = new Date(year, month, 1)
+    const startingDay = firstDayOfMonth.getDay()
 
-    if (value === "="){
-      if(result === "" || parseFloat(result)===0){
-        setResult("")
-      } else {
-        try {
-          setResult (evaluate (result))
-        }catch (error){
-          setResult("Error", error)
+    const daysInMonth = new Date (year, month + 1, 0).getDate()
+    const calendar = [];
+
+    let day = 1;
+
+    for(let i=0; i<6; i++){
+      const week = [];
+
+      for (let j=0; j<7; j++){
+        if(i===0 && j<startingDay) {
+          week.push(<td key = {`empty-${j}`}></td>)
+        } else if (day <=daysInMonth) {
+          week.push (<td key = {day}>{day}</td>)
+          day++;
         }
       }
-      
-    }else if (value=== "c"){
-        setResult("");
-      }else if (value=== "USD-INR"){
-        if(!exchangeRate) await fetchExchangeRate();
-        setResult(prevResult => prevResult + `*${exchangeRate}`)
-    }else if (value === "INR-USD"){
-      if(!exchangeRate) await fetchExchangeRate();
-      setResult(prevResult => prevResult + `/${exchangeRate}`)
-    }else{
-      setResult(prevResult => prevResult + value)
+      calendar.push (<tr key={i}>{week}</tr>)
+      if (day > daysInMonth) break;
     }
+
+    return (
+     <table>
+      <thead>
+        <tr>
+          {daysOfWeek.map (day => (
+            <th key={day}>{day}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>{calendar}</tbody>
+     </table>
+    )
   }
 
-  return (
-    <div className="App">
-      <div className='calculator'>
-        <input type='text' value={result} readOnly/>
-        <div className='buttons'>
-          <button onClick={() => handleClick("1")}>1</button>
-          <button onClick={() => handleClick("2")}>2</button>
-          <button onClick={() => handleClick("3")}>3</button>
-          <button onClick={() => handleClick("+")}>+</button>
-          <button onClick={() => handleClick("4")}>4</button>
-          <button onClick={() => handleClick("5")}>5</button>
-          <button onClick={() => handleClick("6")}>6</button>
-          <button onClick={() => handleClick("-")}>-</button>
-          <button onClick={() => handleClick("7")}>7</button>
-          <button onClick={() => handleClick("8")}>8</button>
-          <button onClick={() => handleClick("9")}>9</button>
-          <button onClick={() => handleClick("*")}>*</button>
-          <button onClick={() => handleClick("c")}>c</button>
-          <button onClick={() => handleClick("0")}>0</button>
-          <button onClick={() => handleClick("=")}>=</button>
-          <button onClick={() => handleClick("/")}>/</button>
-          <button onClick={() => handleClick("USD-INR")}>$ to INR</button>
-          <button onClick={() => handleClick("INR-USD")}>INR to $</button>
+  const handlePrevMonth = () => {
+    setDate(prevDate => {
+      const prevMonth = prevDate.getMonth()-1;
+      return new Date(prevDate.getFullYear(), prevMonth, 1);
+    })
+  }
 
-        </div>
+  const handleNextMonth = () => {
+    setDate(prevDate => {
+      const nextMonth = prevDate.getMonth()+1;
+      return new Date(prevDate.getFullYear(), nextMonth, 1)
+    })
+  }
 
-      </div>
-   
+  return(
+    <div>
+      <h2>
+        {`${date.getFullYear()} ${date.toLocaleString('default', { month: 'long'})}`}
+      </h2>
+      <button onClick={handlePrevMonth}>Previous month</button>
+      <button onClick={handleNextMonth}>Next Month</button>
+      {renderCalendar()}
     </div>
-  );
+  )
 }
 
-export default App;
+export default Calendar;
 
 
