@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import Clock from './Clock';
 
 
  const Calendar = () => {
@@ -63,13 +64,16 @@ import './App.css';
   }
 
   return(
-    <div>
+    <div className='container'>
+        <Clock />
+    <div className='calendar-container'>
       <h2>
         {`${date.getFullYear()} ${date.toLocaleString('default', { month: 'long'})}`}
       </h2>
       <button onClick={handlePrevMonth}>Previous month</button>
       <button onClick={handleNextMonth}>Next Month</button>
       {renderCalendar()}
+      </div>
     </div>
   )
 }
